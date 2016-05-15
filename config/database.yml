@@ -1,0 +1,22 @@
+default: &default
+  adapter: postgresql
+  host: localhost
+  encoding: UTF8
+  pool: 5
+  timeout: 5000
+
+development:
+  <<: *default
+  database: ppresent_dev
+  username: <%= ENV['db_username'] %>
+  password: <%= ENV['db_password'] %>
+
+test:
+  <<: *default
+  database: ppresent_test
+  username: <%= ENV['db_username'] %>
+  password: <%= ENV['db_password'] %>
+
+production:
+  <<: *default
+  database: ppresent_prod
