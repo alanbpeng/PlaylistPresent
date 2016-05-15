@@ -1,4 +1,11 @@
 Rails.application.routes.draw do
+
+  root 'home#index'
+
+  get 'admin' => 'admin#index'
+  get 'admin/auth' => 'admin#auth'
+  get 'admin/auth/callback' => 'admin#callback'
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
