@@ -4,7 +4,7 @@
 
 <div>
 	<% if User.count==0 %>
-		You are not signen in.
+		You are not signed in.
 		<%= link_to 'Sign in with Spotify', '/admin/auth' %>
 	<% else %>
 		Currently signed in as <strong><%= @user.user_id %></strong>.

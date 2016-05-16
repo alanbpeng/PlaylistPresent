@@ -1,3 +1,4 @@
 class Playlist < ActiveRecord::Base
-  self.primary_key = :playlist_id
+  validates :playlist_id, uniqueness: true
+  # self.primary_key = :playlist_id
 end

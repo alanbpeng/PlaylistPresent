@@ -27,8 +27,6 @@ ActiveRecord::Schema.define(version: 20160516072106) do
     t.datetime "updated_at",    null: false
   end
 
-  add_index "playlists", ["playlist_id"], name: "index_playlists_on_playlist_id", unique: true, using: :btree
-
   create_table "users", force: :cascade do |t|
     t.string   "user_id",              null: false
     t.string   "access_token"
@@ -41,7 +39,5 @@ ActiveRecord::Schema.define(version: 20160516072106) do
     t.string   "etag_tracks"
     t.string   "etag_playlists"
   end
-
-  add_index "users", ["user_id"], name: "index_users_on_user_id", unique: true, using: :btree
 
 end
