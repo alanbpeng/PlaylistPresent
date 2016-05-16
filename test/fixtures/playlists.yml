@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  playlist_id: MyString
+  name: MyString
+  owner: MyString
+  url: MyString
+  public: false
+  collaborative: false
+
+two:
+  playlist_id: MyString
+  name: MyString
+  owner: MyString
+  url: MyString
+  public: false
+  collaborative: false

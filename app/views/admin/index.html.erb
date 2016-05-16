@@ -1,1 +1,22 @@
-<%= link_to 'Sign in with Spotify', '/admin/auth' %>
+<% if flash[:error] %>
+	<div><%= flash[:error] %></div>
+<% end %>
+
+<div>
+	<% if User.count==0 %>
+		You are not signen in.
+		<%= link_to 'Sign in with Spotify', '/admin/auth' %>
+	<% else %>
+		Currently signed in as <strong><%= @user.user_id %></strong>.
+		<%= link_to 'Sign out', admin_logout_path, method: :delete %>
+		<div>
+		<% unless @playlists==nil %>
+			<% @playlists.each do |pl| %>
+				<div>
+				<%= pl[:name] %>
+				</div>
+			<% end %>
+		<% end %>
+		</div>
+	<% end %>
+</div>

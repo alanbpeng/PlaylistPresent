@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   get 'admin' => 'admin#index'
   get 'admin/auth' => 'admin#auth'
   get 'admin/auth/callback' => 'admin#callback'
+  delete 'admin/logout' => 'admin#logout'
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
