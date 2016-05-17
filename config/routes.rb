@@ -5,6 +5,9 @@ Rails.application.routes.draw do
   get 'admin' => 'admin#index'
   get 'admin/auth' => 'admin#auth'
   get 'admin/auth/callback' => 'admin#callback'
+  get 'admin/refresh_playlists' => 'admin#refresh_playlists'
+  get 'admin/get_tracks' => 'admin#get_tracks'
+  patch 'admin/select_playlist' => 'admin#select_playlist'
   delete 'admin/logout' => 'admin#logout'
 
   # The priority is based upon order of creation: first created -> highest priority.

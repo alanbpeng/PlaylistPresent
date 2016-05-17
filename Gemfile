@@ -17,7 +17,7 @@ gem 'figaro'
 # Heroku stuff
 gem 'rails_12factor', group: :production
 
-gem 'rspotify'
+# gem 'rspotify'
 
 gem 'bootstrap-sass', '~> 3.2.0'
 gem 'autoprefixer-rails'

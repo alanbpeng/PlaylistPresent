@@ -1,22 +1,54 @@
 <% if flash[:error] %>
-	<div><%= flash[:error] %></div>
+  <div><%= flash[:error] %></div>
 <% end %>
 
-<div>
-	<% if User.count==0 %>
-		You are not signed in.
-		<%= link_to 'Sign in with Spotify', '/admin/auth' %>
-	<% else %>
-		Currently signed in as <strong><%= @user.user_id %></strong>.
-		<%= link_to 'Sign out', admin_logout_path, method: :delete %>
-		<div>
-		<% unless @playlists==nil %>
-			<% @playlists.each do |pl| %>
-				<div>
-				<%= pl[:name] %>
-				</div>
-			<% end %>
-		<% end %>
-		</div>
-	<% end %>
-</div>
+<% if User.count==0 %>
+  <div>
+    You are not signed in.
+    <%= link_to 'Sign in with Spotify', '/admin/auth' %>
+  </div>
+<% else %>
+
+  <div>
+    Currently signed in as <strong><%= @user.user_id %></strong>.
+    <%= link_to 'Sign out', admin_logout_path, method: :delete %>
+  </div>
+  <br />
+  
+  <%= form_for @user, url: admin_select_playlist_path do |f| %>
+    <%= f.radio_button(:selected_playlist_id, "") %>
+    <%= f.label(:selected_playlist_id_, "Use your \"My Music\" library") %>
+    <br />
+
+    <% unless @playlists.count==0 %>
+      <div><strong>Or use one of your playlists:</strong></div>
+      <% @playlists.each do |pl| %>
+        <%= f.radio_button(:selected_playlist_id, pl[:playlist_id]) %>
+        <%= f.label("selected_playlist_id_#{pl[:playlist_id].downcase}".to_s, pl[:name]) %>
+        <br />
+      <% end %>
+    <% else %>
+      <div>You have no playlists.</div>
+    <% end %>
+
+    <%= f.submit "Populate tracks" %>
+    <%= link_to 'Refresh playlists', admin_refresh_playlists_path %>
+  <% end %>
+
+  <br />
+
+  <% unless @tracks.count==0 %>
+    <div><strong>Tracks:</strong></div>
+    <% @tracks.each do |t| %>
+      <div><%= t[:name] %></div>
+    <% end %>
+  <% else %>
+    <div>Your library/selected playlist does not contain any tracks.</div>
+    <%= link_to '(Or you haven\'t populated the tracks yet.)', admin_get_tracks_path %>
+  <% end %>
+
+
+
+
+
+<% end %>

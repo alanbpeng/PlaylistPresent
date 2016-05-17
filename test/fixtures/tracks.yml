@@ -1,0 +1,25 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  track_id: MyString
+  name: MyString
+  artist_id: MyString
+  album_id: MyString
+  disc_number: 1
+  track_number: 1
+  explicit: false
+  duration_ms: 1
+  url: MyString
+  preview_url: MyString
+
+two:
+  track_id: MyString
+  name: MyString
+  artist_id: MyString
+  album_id: MyString
+  disc_number: 1
+  track_number: 1
+  explicit: false
+  duration_ms: 1
+  url: MyString
+  preview_url: MyString
