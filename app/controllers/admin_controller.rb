@@ -83,10 +83,8 @@ class AdminController < ApplicationController
   def logout
     User.destroy_all
     Playlist.destroy_all
-    Track.destroy_all
-    Artist.destroy_all
-    Album.destroy_all
-    # TODO: destroy everything else
+    destroy_data
+    flash[:info] = "You have been signed out."
     redirect_to admin_path
   end
 
@@ -140,16 +138,13 @@ class AdminController < ApplicationController
     playlists.each do |pl|
       pl.save
     end
-    # TODO: some confirmation goes here 
+    flash[:info] = "The playlists have been refreshed."
     redirect_to admin_path
   end
 
   def select_playlist
     User.first.update(selected_playlist_id: params[:user][:selected_playlist_id])
-    Track.destroy_all
-    Artist.destroy_all
-    Album.destroy_all
-    # TODO: destroy everything else
+    destroy_data
     # redirect_to admin_path
     redirect_to admin_get_tracks_path
   end
@@ -175,7 +170,9 @@ class AdminController < ApplicationController
       end
     end
     
+    # Get track information
     tracks = []
+    track_artists = []
     artist_ids = []
     album_ids = []
     offset = 0
@@ -192,7 +189,6 @@ class AdminController < ApplicationController
           t = tt['track']
           tracks.push(Track.new({track_id: t['id'],
                                  name: t['name'],
-                                 # artist_id: t['artists'][0]['id'],
                                  album_id: t['album']['id'],
                                  disc_number: t['disc_number'].to_i,
                                  track_number: t['track_number'].to_i,
@@ -201,6 +197,7 @@ class AdminController < ApplicationController
                                  url: t['external_urls']['spotify'],
                                  preview_url: t['preview_url']}))
           t['artists'].each do |a|
+            track_artists.push({track_id: t['id'], artist_id: a['id']})
             artist_ids.push(a['id'])
           end
           album_ids.push(t['album']['id'])
@@ -217,6 +214,7 @@ class AdminController < ApplicationController
 
     # Get album information 20 at a time
     albums = []
+    album_artists = []
     album_ids = album_ids.uniq
     while album_ids.count>0 do
       album_queries = album_ids.take(20).join(',')
@@ -226,11 +224,11 @@ class AdminController < ApplicationController
         albums_body['albums'].each do |a|
           albums.push(Album.new({album_id: a['id'],
                                  name: a['name'],
-                                 # artist_id: a['artists'][0]['id'],
                                  year: a['release_date'][0..3],
                                  image_url: a['images'][0],
                                  url: a['external_urls']['spotify']}))
           a['artists'].each do |ar|
+            album_artists.push({album_id: a['id'], artist_id: ar['id']})
             artist_ids.push(ar['id'])
           end
         end
@@ -266,21 +264,27 @@ class AdminController < ApplicationController
       artist_ids = artist_ids.drop(50)
     end
 
-    Track.destroy_all
-    Album.destroy_all
-    Artist.destroy_all
+    # Reset and save all data, as well as the associations
+    destroy_data
 
-    tracks.each do |t|
-      t.save
-    end
     albums.each do |a|
       a.save
+    end
+    tracks.each do |t|
+      t.album = Album.find_by(album_id: t.album_id)
+      t.save
     end
     artists.each do |a|
       a.save
     end
+    track_artists.each do |ta|
+      Artist.find_by(artist_id: ta[:artist_id]).tracks << Track.find_by(track_id: ta[:track_id])
+    end
+    album_artists.each do |aa|
+      Artist.find_by(artist_id: aa[:artist_id]).albums << Album.find_by(album_id: aa[:album_id])
+    end
 
-    # TODO: some confirmation goes here 
+    flash[:info] = "Successfully fetched the tracks."
     redirect_to admin_path
   end
 
@@ -391,6 +395,14 @@ class AdminController < ApplicationController
                     use_ssl: spotify_uri.scheme == 'https') do |http|
       http.request(spotify_req)
     end
+  end
+
+  def destroy_data
+    Track.destroy_all
+    Artist.destroy_all
+    Album.destroy_all
+    TrackArtist.destroy_all
+    AlbumArtist.destroy_all
   end
 
 end

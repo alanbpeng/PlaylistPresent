@@ -11,10 +11,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160517035232) do
+ActiveRecord::Schema.define(version: 20160517054013) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "album_artists", force: :cascade do |t|
+    t.integer  "album_id",   null: false
+    t.integer  "artist_id",  null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "albums", force: :cascade do |t|
     t.string   "album_id",   null: false
@@ -44,6 +51,13 @@ ActiveRecord::Schema.define(version: 20160517035232) do
     t.boolean  "collaborative"
     t.datetime "created_at",    null: false
     t.datetime "updated_at",    null: false
+  end
+
+  create_table "track_artists", force: :cascade do |t|
+    t.integer  "track_id",   null: false
+    t.integer  "artist_id",  null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "tracks", force: :cascade do |t|

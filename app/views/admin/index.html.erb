@@ -1,5 +1,10 @@
 <% if flash[:error] %>
   <div><%= flash[:error] %></div>
+  <br />
+<% end %>
+<% if flash[:info] %>
+  <div><%= flash[:info] %></div>
+  <br />
 <% end %>
 
 <% if User.count==0 %>
@@ -11,7 +16,7 @@
 
   <div>
     Currently signed in as <strong><%= @user.user_id %></strong>.
-    <%= link_to 'Sign out', admin_logout_path, method: :delete %>
+    <%= link_to 'Sign out', admin_logout_path, method: :delete, data: {confirm: "Are you sure you want to sign out?"} %>
   </div>
   <br />
   
