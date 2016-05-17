@@ -38,6 +38,18 @@
   <br />
 
   <% unless @tracks.count==0 %>
+    <div><strong>Artists:</strong></div>
+    <% @artists.each do |a| %>
+      <div><%= a[:name] %></div>
+    <% end %>
+    <br />
+    
+    <div><strong>Albums:</strong></div>
+    <% @albums.each do |a| %>
+      <div><%= a[:name] %></div>
+    <% end %>
+    <br />
+
     <div><strong>Tracks:</strong></div>
     <% @tracks.each do |t| %>
       <div><%= t[:name] %></div>

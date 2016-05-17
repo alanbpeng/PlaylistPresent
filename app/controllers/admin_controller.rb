@@ -3,6 +3,8 @@ class AdminController < ApplicationController
   def index
     @user = User.first
     @playlists = Playlist.all
+    @artists = Artist.all
+    @albums = Album.all
     @tracks = Track.all
   end
 
@@ -82,7 +84,9 @@ class AdminController < ApplicationController
     User.destroy_all
     Playlist.destroy_all
     Track.destroy_all
-    # TODO: everything else
+    Artist.destroy_all
+    Album.destroy_all
+    # TODO: destroy everything else
     redirect_to admin_path
   end
 
@@ -142,14 +146,14 @@ class AdminController < ApplicationController
 
   def select_playlist
     User.first.update(selected_playlist_id: params[:user][:selected_playlist_id])
-    # TODO: reget tracks
     Track.destroy_all
-    # TODO?
+    Artist.destroy_all
+    Album.destroy_all
+    # TODO: destroy everything else
     # redirect_to admin_path
     redirect_to admin_get_tracks_path
   end
 
-  # TODO
   def get_tracks
     user = User.first
 
@@ -172,13 +176,12 @@ class AdminController < ApplicationController
     end
     
     tracks = []
+    artist_ids = []
+    album_ids = []
     offset = 0
     while true do
       tracks_res = nil
       if user.selected_playlist_id==""
-        # # TODO
-        # render plain: "TODO: Library is selected"
-        # return
         tracks_res = call_get_library_tracks(user, offset)
       else
         tracks_res = call_get_playlist_tracks(user, offset)
@@ -189,7 +192,7 @@ class AdminController < ApplicationController
           t = tt['track']
           tracks.push(Track.new({track_id: t['id'],
                                  name: t['name'],
-                                 artist_id: t['artists'][0]['id'],
+                                 # artist_id: t['artists'][0]['id'],
                                  album_id: t['album']['id'],
                                  disc_number: t['disc_number'].to_i,
                                  track_number: t['track_number'].to_i,
@@ -197,6 +200,10 @@ class AdminController < ApplicationController
                                  duration_ms: t['duration_ms'].to_i,
                                  url: t['external_urls']['spotify'],
                                  preview_url: t['preview_url']}))
+          t['artists'].each do |a|
+            artist_ids.push(a['id'])
+          end
+          album_ids.push(t['album']['id'])
         end
         offset = tracks_body['limit'].to_i + tracks_body['offset']
         break unless offset < tracks_body['total'].to_i
@@ -208,10 +215,71 @@ class AdminController < ApplicationController
       end
     end
 
+    # Get album information 20 at a time
+    albums = []
+    album_ids = album_ids.uniq
+    while album_ids.count>0 do
+      album_queries = album_ids.take(20).join(',')
+      album_res = call_get_albums(user, album_queries)
+      if album_res.is_a?(Net::HTTPSuccess)
+        albums_body = JSON.parse(album_res.body)
+        albums_body['albums'].each do |a|
+          albums.push(Album.new({album_id: a['id'],
+                                 name: a['name'],
+                                 # artist_id: a['artists'][0]['id'],
+                                 year: a['release_date'][0..3],
+                                 image_url: a['images'][0],
+                                 url: a['external_urls']['spotify']}))
+          a['artists'].each do |ar|
+            artist_ids.push(ar['id'])
+          end
+        end
+      else
+        album_res = JSON.parse(album_res.body)
+        flash[:error] = "Error when getting albums: #{album_res['error']['message']} (#{album_res['error']['status']})"
+        redirect_to admin_path
+        return
+      end
+      album_ids = album_ids.drop(20)
+    end
+
+    # Get artist information 50 at a time
+    artists = []
+    artist_ids = artist_ids.uniq
+    while artist_ids.count>0 do
+      artist_queries = artist_ids.take(50).join(',')
+      artist_res = call_get_artists(user, artist_queries)
+      if artist_res.is_a?(Net::HTTPSuccess)
+        artist_body = JSON.parse(artist_res.body)
+        artist_body['artists'].each do |a|
+          artists.push(Artist.new({artist_id: a['id'],
+                                   name: a['name'],
+                                   image_url: a['images'][0],
+                                   url: a['external_urls']['spotify']}))
+        end
+      else
+        artist_res = JSON.parse(artist_res.body)
+        flash[:error] = "Error when getting artists: #{artist_res['error']['message']} (#{artist_res['error']['status']})"
+        redirect_to admin_path
+        return
+      end
+      artist_ids = artist_ids.drop(50)
+    end
+
     Track.destroy_all
+    Album.destroy_all
+    Artist.destroy_all
+
     tracks.each do |t|
       t.save
     end
+    albums.each do |a|
+      a.save
+    end
+    artists.each do |a|
+      a.save
+    end
+
     # TODO: some confirmation goes here 
     redirect_to admin_path
   end
@@ -285,6 +353,36 @@ class AdminController < ApplicationController
     # Set up the request
     spotify_uri = URI("https://api.spotify.com/v1/me/tracks")
     spotify_uri.query = URI.encode_www_form({limit: limit, offset: offset})
+    spotify_req = Net::HTTP::Get.new(spotify_uri)
+    spotify_req['Authorization'] = "Bearer #{user.access_token}"
+
+    # Sends and (implicitly) returns the request
+    Net::HTTP.start(spotify_uri.hostname, spotify_uri.port,
+                    use_ssl: spotify_uri.scheme == 'https') do |http|
+      http.request(spotify_req)
+    end
+  end
+
+  # Makes a GET request for the details of the given albums
+  def call_get_albums(user, albums)
+    # Set up the request
+    spotify_uri = URI("https://api.spotify.com/v1/albums")
+    spotify_uri.query = URI.encode_www_form({ids: albums})
+    spotify_req = Net::HTTP::Get.new(spotify_uri)
+    spotify_req['Authorization'] = "Bearer #{user.access_token}"
+
+    # Sends and (implicitly) returns the request
+    Net::HTTP.start(spotify_uri.hostname, spotify_uri.port,
+                    use_ssl: spotify_uri.scheme == 'https') do |http|
+      http.request(spotify_req)
+    end
+  end
+
+  # Makes a GET request for the details of the given artists
+  def call_get_artists(user, artists)
+    # Set up the request
+    spotify_uri = URI("https://api.spotify.com/v1/artists")
+    spotify_uri.query = URI.encode_www_form({ids: artists})
     spotify_req = Net::HTTP::Get.new(spotify_uri)
     spotify_req['Authorization'] = "Bearer #{user.access_token}"
 

@@ -11,10 +11,29 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160517015940) do
+ActiveRecord::Schema.define(version: 20160517035232) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "albums", force: :cascade do |t|
+    t.string   "album_id",   null: false
+    t.string   "name"
+    t.string   "image_url"
+    t.string   "year"
+    t.string   "url"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "artists", force: :cascade do |t|
+    t.string   "artist_id",  null: false
+    t.string   "name"
+    t.string   "image_url"
+    t.string   "url"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "playlists", force: :cascade do |t|
     t.string   "playlist_id",   null: false
@@ -30,7 +49,6 @@ ActiveRecord::Schema.define(version: 20160517015940) do
   create_table "tracks", force: :cascade do |t|
     t.string   "track_id",     null: false
     t.string   "name"
-    t.string   "artist_id"
     t.string   "album_id"
     t.integer  "disc_number"
     t.integer  "track_number"
