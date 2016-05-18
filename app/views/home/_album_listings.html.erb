@@ -1,0 +1,10 @@
+<% unless @albums.count==0 %>
+  
+  <% @albums.each do |a| %>
+    <%= render partial: 'home/album_tracklist', locals: {album: a} %>
+  <% end %>
+
+<% else %>
+  <div>Your library/selected playlist does not contain any tracks.</div>
+  <div>(Or you haven't populated the tracks yet.)</div>
+<% end %>

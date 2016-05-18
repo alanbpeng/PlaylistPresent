@@ -1,0 +1,20 @@
+<%= form_for @user, url: admin_select_playlist_path do |f| %>
+  <%= f.radio_button(:selected_playlist_id, "") %>
+  <%= f.label(:selected_playlist_id_, "Use your \"My Music\" library") %>
+  <br />
+
+  <% unless @playlists.count==0 %>
+    <div><strong>Or use one of your playlists:</strong></div>
+    <% @playlists.each do |pl| %>
+      <%= f.radio_button(:selected_playlist_id, pl[:playlist_id]) %>
+      <%= f.label("selected_playlist_id_#{pl[:playlist_id].downcase}".to_s, pl[:name]) %>
+      <br />
+    <% end %>
+  <% else %>
+    <div>You have no playlists.</div>
+  <% end %>
+
+  <%= f.submit "Populate tracks" %>
+  <%= link_to 'Refresh playlists', admin_refresh_playlists_path %>
+<% end %>
+<br />

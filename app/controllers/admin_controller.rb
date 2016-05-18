@@ -3,9 +3,7 @@ class AdminController < ApplicationController
   def index
     @user = User.first
     @playlists = Playlist.all
-    @artists = Artist.all
-    @albums = Album.all
-    @tracks = Track.all
+    @albums = Album.all.order(:name)
   end
 
   def auth
@@ -217,7 +215,7 @@ class AdminController < ApplicationController
     album_artists = []
     album_ids = album_ids.uniq
     while album_ids.count>0 do
-      album_queries = album_ids.take(20).join(',')
+      album_queries = album_ids.shift(20).join(',')
       album_res = call_get_albums(user, album_queries)
       if album_res.is_a?(Net::HTTPSuccess)
         albums_body = JSON.parse(album_res.body)
@@ -238,14 +236,13 @@ class AdminController < ApplicationController
         redirect_to admin_path
         return
       end
-      album_ids = album_ids.drop(20)
     end
 
     # Get artist information 50 at a time
     artists = []
     artist_ids = artist_ids.uniq
     while artist_ids.count>0 do
-      artist_queries = artist_ids.take(50).join(',')
+      artist_queries = artist_ids.shift(50).join(',')
       artist_res = call_get_artists(user, artist_queries)
       if artist_res.is_a?(Net::HTTPSuccess)
         artist_body = JSON.parse(artist_res.body)
@@ -261,7 +258,6 @@ class AdminController < ApplicationController
         redirect_to admin_path
         return
       end
-      artist_ids = artist_ids.drop(50)
     end
 
     # Reset and save all data, as well as the associations
@@ -298,11 +294,7 @@ class AdminController < ApplicationController
     spotify_req['Authorization'] = "Basic #{Base64.strict_encode64(ENV['spotify_client_id']+':'+ENV['spotify_client_secret'])}"
     spotify_req.set_form_data(params)
 
-    # Sends and (implicitly) returns the request
-    Net::HTTP.start(spotify_uri.hostname, spotify_uri.port,
-                    use_ssl: spotify_uri.scheme == 'https') do |http|
-      http.request(spotify_req)
-    end
+    send_request(spotify_uri, spotify_req)
   end
 
   # Makes a GET request for the basic profile info for the user
@@ -312,11 +304,7 @@ class AdminController < ApplicationController
     spotify_req = Net::HTTP::Get.new(spotify_uri)
     spotify_req['Authorization'] = "Bearer #{access_token}"
 
-    # Sends and (implicitly) returns the request
-    Net::HTTP.start(spotify_uri.hostname, spotify_uri.port,
-                    use_ssl: spotify_uri.scheme == 'https') do |http|
-      http.request(spotify_req)
-    end
+    send_request(spotify_uri, spotify_req)
   end
 
   # Makes a GET request for the user's playlists
@@ -327,11 +315,7 @@ class AdminController < ApplicationController
     spotify_req = Net::HTTP::Get.new(spotify_uri)
     spotify_req['Authorization'] = "Bearer #{user.access_token}"
 
-    # Sends and (implicitly) returns the request
-    Net::HTTP.start(spotify_uri.hostname, spotify_uri.port,
-                    use_ssl: spotify_uri.scheme == 'https') do |http|
-      http.request(spotify_req)
-    end
+    send_request(spotify_uri, spotify_req)
   end
 
   # Makes a GET request for the tracks in the selected playlist
@@ -345,11 +329,7 @@ class AdminController < ApplicationController
     spotify_req = Net::HTTP::Get.new(spotify_uri)
     spotify_req['Authorization'] = "Bearer #{user.access_token}"
 
-    # Sends and (implicitly) returns the request
-    Net::HTTP.start(spotify_uri.hostname, spotify_uri.port,
-                    use_ssl: spotify_uri.scheme == 'https') do |http|
-      http.request(spotify_req)
-    end
+    send_request(spotify_uri, spotify_req)
   end
 
   # Makes a GET request for the tracks in the library
@@ -360,11 +340,7 @@ class AdminController < ApplicationController
     spotify_req = Net::HTTP::Get.new(spotify_uri)
     spotify_req['Authorization'] = "Bearer #{user.access_token}"
 
-    # Sends and (implicitly) returns the request
-    Net::HTTP.start(spotify_uri.hostname, spotify_uri.port,
-                    use_ssl: spotify_uri.scheme == 'https') do |http|
-      http.request(spotify_req)
-    end
+    send_request(spotify_uri, spotify_req)
   end
 
   # Makes a GET request for the details of the given albums
@@ -375,11 +351,7 @@ class AdminController < ApplicationController
     spotify_req = Net::HTTP::Get.new(spotify_uri)
     spotify_req['Authorization'] = "Bearer #{user.access_token}"
 
-    # Sends and (implicitly) returns the request
-    Net::HTTP.start(spotify_uri.hostname, spotify_uri.port,
-                    use_ssl: spotify_uri.scheme == 'https') do |http|
-      http.request(spotify_req)
-    end
+    send_request(spotify_uri, spotify_req)
   end
 
   # Makes a GET request for the details of the given artists
@@ -390,7 +362,11 @@ class AdminController < ApplicationController
     spotify_req = Net::HTTP::Get.new(spotify_uri)
     spotify_req['Authorization'] = "Bearer #{user.access_token}"
 
-    # Sends and (implicitly) returns the request
+    send_request(spotify_uri, spotify_req)
+  end
+
+  # Sends and (implicitly) returns the given request
+  def send_request(spotify_uri, spotify_req)
     Net::HTTP.start(spotify_uri.hostname, spotify_uri.port,
                     use_ssl: spotify_uri.scheme == 'https') do |http|
       http.request(spotify_req)
