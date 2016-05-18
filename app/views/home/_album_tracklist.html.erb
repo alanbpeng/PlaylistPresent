@@ -1,38 +1,37 @@
 <div class="row album_tracklist" id="<%= album.album_id %>">
   <div class="hidden-xs col-sm-4 col-md-3 cover_art">
-    <!-- TODO -->
-    <img src='blank.png' style='m'>
+    <%= link_to content_tag(:img, nil, src: album[:image_url], class: "cover_art_img"), album[:url] %>
   </div>
 
   <div class="col-xs-12 col-sm-8 col-md-9 album">
     <div class="row">
       <div class="visible-xs-block col-xs-3 cover_art">
-        <!-- TODO -->
-        <img src='blank.png' style=''>
+        <%= link_to content_tag(:img, nil, src: album[:image_url], class: "cover_art_img"), album[:url] %>
       </div>
-      <% album_disp = album.artists.pluck(:name) %>
-      <h3 class="col-xs-9 col-sm-12 title">
-        <%= album[:name] %>
-        <small class="album_artists"><%= album_disp.join(", ") %></small>
+      <% album_disp = album.artists.pluck(:name, :url) %>
+      <h3 class="col-xs-9 col-sm-12 album_title">
+        <%= link_to album[:name], album[:url] %>
+        <small class="album_artists"><%= raw album_disp.map{|aa| link_to aa[0], aa[1]}.join(", ") %></small>
       </h3>
     </div>
 
     <% album_discs = album.tracks.pluck(:disc_number).uniq.sort %>
     <% album_discs.each do |disc| %>
-      <div class="row disc_<%= disc %>">
+      <div class="row tracks">
         <% unless album_discs.count==1 && disc==1 %>
-          <h4><%= "Disc #{disc}" %></h4>
+          <h4 class="disc_number"><%= "Disc #{disc}" %></h4>
         <% end %>
         <!-- TODO -->
-        <ul class="col-xs-12 col-md-8 tracklist">
+        <div class="col-xs-12 col-lg-10 tracklist">
           <% album.tracks.where(disc_number: disc).order(:track_number).each do |track| %>
-            <li id="<%= track.track_id %>">
-              <%= track[:track_number].to_s + " - " + track[:name] %>
-              <% track_disp = track.artists.pluck(:name).delete_if { |track| album_disp.include?(track) } %>
-              <small><%= (track_disp.empty? ? "" : " \u2022 #{track_disp.join(", ") }") %></small>
-            </li>
+            <div class="track" id="<%= track.track_id %>">
+              <%= track[:track_number].to_s + " \u2022 " %> 
+              <%= link_to track[:name], track[:url] %>
+              <% track_disp = track.artists.pluck(:name, :url).delete_if { |track| album_disp.include?(track) } %>
+              <small class="track_artists"><%= raw (track_disp.empty? ? "" : " \u2022 " + track_disp.map{|ta| link_to ta[0], ta[1]}.join(", ")) %></small>
+            </div>
           <% end %>
-        </ul>
+        </div>
       </div>
     <% end %>
   </div>

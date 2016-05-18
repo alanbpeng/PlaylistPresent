@@ -15,5 +15,18 @@
 
 <%= yield %>
 
+<footer class="footer">
+  <div class="container">
+    <% if params[:controller]!="admin" %>
+      <%= link_to "Admin", admin_path, class: "text-muted" %>
+      <div class="text-muted">&#8226;</div>
+    <% elsif User.count!=0 %>
+      <%= link_to "Home", root_path, class: "text-muted" %>
+      <div class="text-muted">&#8226;</div>
+    <% end %>
+    <%= link_to "Source", ENV['source_url'], class: "text-muted" %></div>
+  </div>
+</footer>
+
 </body>
 </html>

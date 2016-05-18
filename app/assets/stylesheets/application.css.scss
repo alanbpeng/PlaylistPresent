@@ -17,23 +17,61 @@
 @import "bootstrap-sprockets";
 @import "bootstrap";
 
-h3.title {
-	margin-top: 10px;
-	padding-left: 10px !important;
-	padding-right: 10px !important;
+.alert {
+	margin-bottom: 0px;
 }
-div.cover_art {
+.album_listing {
+	padding-top: 15px;
+}
+.album_listing * {
+	color: unset;
+}
+.album_tracklist {
+	margin-bottom: 10px;
+}
+.cover_art_img {
 	padding-top: 15px;
 	padding-bottom: 15px;
-}
-div.cover_art > img {
 	max-width: 100%;
 	height: auto;
 }
+.album_title {
+	margin-top: 15px;
+	margin-bottom: 10px;
+	padding-left: 0px !important;
+	padding-right: 0px !important;
+}
+.album_artists {
+	color: $headings-small-color
+}
 @media only screen and (min-width: $screen-sm) {
-	ul.tracklist {
+	.tracklist {
 		-webkit-column-count: 2;
 		-moz-column-count: 2;
 		column-count: 2;
+	}
+}
+.track * {
+	display: inline;
+}
+.disc_number {
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+.track_artists {
+	color: $headings-small-color
+}
+
+.footer {
+	padding-bottom: 10px;
+	position: fixed;
+	bottom: 0px;
+	width: 100%;
+	.container {
+		text-align: right;
+		* {
+			display: inline;
+			color: unset;
+		}
 	}
 }

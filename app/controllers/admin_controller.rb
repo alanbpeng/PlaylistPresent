@@ -1,4 +1,5 @@
 class AdminController < ApplicationController
+  http_basic_authenticate_with name: ENV['admin_username'], password: ENV['admin_password']
 
   def index
     @user = User.first
@@ -229,7 +230,7 @@ class AdminController < ApplicationController
           albums.push(Album.new({album_id: a['id'],
                                  name: a['name'],
                                  year: a['release_date'][0..3],
-                                 image_url: a['images'][0],
+                                 image_url: (a['images'].empty? ? nil : a['images'][0]['url']),
                                  url: a['external_urls']['spotify']}))
           a['artists'].each do |ar|
             album_artists.push({album_id: a['id'], artist_id: ar['id']})
