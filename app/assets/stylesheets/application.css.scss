@@ -14,5 +14,26 @@
  *= require_self
  */
 
-@import "bootstrap-sprockets"
-@import "bootstrap"
+@import "bootstrap-sprockets";
+@import "bootstrap";
+
+h3.title {
+	margin-top: 10px;
+	padding-left: 10px !important;
+	padding-right: 10px !important;
+}
+div.cover_art {
+	padding-top: 15px;
+	padding-bottom: 15px;
+}
+div.cover_art > img {
+	max-width: 100%;
+	height: auto;
+}
+@media only screen and (min-width: $screen-sm) {
+	ul.tracklist {
+		-webkit-column-count: 2;
+		-moz-column-count: 2;
+		column-count: 2;
+	}
+}

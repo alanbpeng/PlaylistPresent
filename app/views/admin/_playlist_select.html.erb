@@ -1,20 +1,27 @@
-<%= form_for @user, url: admin_select_playlist_path do |f| %>
-  <%= f.radio_button(:selected_playlist_id, "") %>
-  <%= f.label(:selected_playlist_id_, "Use your \"My Music\" library") %>
-  <br />
-
-  <% unless @playlists.count==0 %>
-    <div><strong>Or use one of your playlists:</strong></div>
-    <% @playlists.each do |pl| %>
-      <%= f.radio_button(:selected_playlist_id, pl[:playlist_id]) %>
-      <%= f.label("selected_playlist_id_#{pl[:playlist_id].downcase}".to_s, pl[:name]) %>
-      <br />
+<div class="playlist_select">
+  <%= form_for @user, url: admin_select_playlist_path do |f| %>
+    <div class="radio">
+      <label>
+        <%= f.radio_button(:selected_playlist_id, "") %>
+        Use your "My Music" library
+      </label>
+    </div>
+    <% unless @playlists.count==0 %>
+      <div><strong>Or use one of your playlists:</strong></div>
+      <% @playlists.each do |pl| %>
+        <div class="radio">
+          <label>
+            <%= f.radio_button(:selected_playlist_id, pl[:playlist_id]) %>
+            <%= pl[:name] %>
+          </label>
+        </div>
+      <% end %>
+    <% else %>
+      <div>You have no playlists.</div>
     <% end %>
-  <% else %>
-    <div>You have no playlists.</div>
-  <% end %>
 
-  <%= f.submit "Populate tracks" %>
-  <%= link_to 'Refresh playlists', admin_refresh_playlists_path %>
-<% end %>
-<br />
+    <%= f.submit "Populate tracks", class: "btn btn-primary" %>
+    <%= link_to 'Refresh playlists', admin_refresh_playlists_path, {class: "btn btn-default", role: "button"} %>
+  <% end %>
+  <br />
+</div>

@@ -1,19 +1,40 @@
-<div>
-  <strong><%= album[:name] %></strong>
-  <% album_disp = album.artists.pluck(:name) %>
-  <%= " \u2022 #{album_disp.join(", ")}" %>
-</div>
+<div class="row album_tracklist" id="<%= album.album_id %>">
+  <div class="hidden-xs col-sm-4 col-md-3 cover_art">
+    <!-- TODO -->
+    <img src='blank.png' style='m'>
+  </div>
 
-<% album_discs = album.tracks.pluck(:disc_number).uniq.sort %>
-<% album_discs.each do |disc| %>
-  <%= "Disc #{disc}" unless album_discs.count==1 && disc==1 %>
-  <ul>
-    <% album.tracks.where(disc_number: disc).order(:track_number).each do |track| %>
-      <li>
-        <%= track[:track_number].to_s + " - " + track[:name] %>
-        <% track_disp = track.artists.pluck(:name).delete_if { |track| album_disp.include?(track) } %>
-        <%= (track_disp.empty? ? "" : " \u2022 #{track_disp.join(", ") }") %>
-      </li>
+  <div class="col-xs-12 col-sm-8 col-md-9 album">
+    <div class="row">
+      <div class="visible-xs-block col-xs-3 cover_art">
+        <!-- TODO -->
+        <img src='blank.png' style=''>
+      </div>
+      <% album_disp = album.artists.pluck(:name) %>
+      <h3 class="col-xs-9 col-sm-12 title">
+        <%= album[:name] %>
+        <small class="album_artists"><%= album_disp.join(", ") %></small>
+      </h3>
+    </div>
+
+    <% album_discs = album.tracks.pluck(:disc_number).uniq.sort %>
+    <% album_discs.each do |disc| %>
+      <div class="row disc_<%= disc %>">
+        <% unless album_discs.count==1 && disc==1 %>
+          <h4><%= "Disc #{disc}" %></h4>
+        <% end %>
+        <!-- TODO -->
+        <ul class="col-xs-12 col-md-8 tracklist">
+          <% album.tracks.where(disc_number: disc).order(:track_number).each do |track| %>
+            <li id="<%= track.track_id %>">
+              <%= track[:track_number].to_s + " - " + track[:name] %>
+              <% track_disp = track.artists.pluck(:name).delete_if { |track| album_disp.include?(track) } %>
+              <small><%= (track_disp.empty? ? "" : " \u2022 #{track_disp.join(", ") }") %></small>
+            </li>
+          <% end %>
+        </ul>
+      </div>
     <% end %>
-  </ul>
-<% end %>
+  </div>
+
+</div>

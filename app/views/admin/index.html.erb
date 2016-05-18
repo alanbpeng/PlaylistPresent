@@ -1,15 +1,16 @@
-<% if User.count==0 %>
-  <div>
-    You are not signed in.
-    <%= link_to 'Sign in with Spotify', '/admin/auth' %>
-  </div>
-<% else %>
-  <div>
-    Currently signed in as <strong><%= @user.user_id %></strong>.
-    <%= link_to 'Sign out', admin_logout_path, method: :delete, data: {confirm: "Are you sure you want to sign out?"} %>
-  </div>
-  <%= render 'playlist_select' %>
-<% end %>
-<br />
+<div class="container admin">
+  <% if User.count==0 %>
+    <div class="user">
+      You are not signed in.
+      <%= link_to 'Sign in with Spotify', '/admin/auth', {class: "btn btn-info btn-sm", role: "button"} %>
+    </div>
+  <% else %>
+    <div class="user">
+      Currently signed in as <strong><%= @user.user_id %></strong>.
+      <%= link_to 'Sign out', admin_logout_path, {class: "btn btn-danger btn-sm", role: "button", method: :delete, data: {confirm: "Are you sure you want to sign out?"}} %>
+    </div>
+    <%= render 'playlist_select' %>
+  <% end %>
+</div>
 
 <%= render 'home/album_listings' %>

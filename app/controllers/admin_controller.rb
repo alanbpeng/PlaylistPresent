@@ -48,32 +48,33 @@ class AdminController < ApplicationController
                          selected_playlist_id: "")
 
             # redirect_to admin_path
+            flash[:info] = "You have been signed in."
             redirect_to admin_refresh_playlists_path
             return
           end
           
           # Else, could not complete token request for some reason
           profile_body = JSON.parse(profile_res.body)
-          flash[:error] = "Error when getting profile info: #{profile_body['error']['message']} (#{profile_body['error']['status']})"
+          flash[:danger] = "Error when getting profile info: #{profile_body['error']['message']} (#{profile_body['error']['status']})"
           redirect_to admin_path
           return
         end
         
         # Else, could not complete token request for some reason
         token_body = JSON.parse(token_res.body)
-        flash[:error] = "Error when getting tokens: #{token_body['error_description']} (#{token_body['error']})"
+        flash[:danger] = "Error when getting tokens: #{token_body['error_description']} (#{token_body['error']})"
         redirect_to admin_path
         return
       
       elsif auth_res_params.has_key?("error")
-        flash[:error] = "Error when authenticating: returned \"#{auth_res_params["error"][0]}\""
+        flash[:danger] = "Error when authenticating: returned \"#{auth_res_params["error"][0]}\""
         redirect_to admin_path
         return
       end
     end
 
     # If we got here, callback is improperly reached
-    flash[:error] = "Error: invalid callback"
+    flash[:danger] = "Error: invalid callback"
     redirect_to admin_path
     return
   end
@@ -101,7 +102,7 @@ class AdminController < ApplicationController
         user.save
       else
         token_body = JSON.parse(token_res.body)
-        flash[:error] = "Error when refreshing token: #{token_body['error_description']} (#{token_body['error']})"
+        flash[:danger] = "Error when refreshing token: #{token_body['error_description']} (#{token_body['error']})"
         redirect_to admin_path
         return
       end
@@ -126,7 +127,7 @@ class AdminController < ApplicationController
         break unless offset < playlists_body['total'].to_i
       else
         playlists_body = JSON.parse(playlists_res.body)
-        flash[:error] = "Error when getting playlists: #{playlists_body['error']['message']} (#{playlists_body['error']['status']})"
+        flash[:danger] = "Error when getting playlists: #{playlists_body['error']['message']} (#{playlists_body['error']['status']})"
         redirect_to admin_path
         return
       end
@@ -136,7 +137,12 @@ class AdminController < ApplicationController
     playlists.each do |pl|
       pl.save
     end
-    flash[:info] = "The playlists have been refreshed."
+
+    if flash[:info]
+      flash.keep
+    else 
+      flash[:info] = "The playlists have been refreshed."
+    end
     redirect_to admin_path
   end
 
@@ -162,7 +168,7 @@ class AdminController < ApplicationController
         user.save
       else
         token_body = JSON.parse(token_res.body)
-        flash[:error] = "Error when refreshing token: #{token_body['error_description']} (#{token_body['error']})"
+        flash[:danger] = "Error when refreshing token: #{token_body['error_description']} (#{token_body['error']})"
         redirect_to admin_path
         return
       end
@@ -204,7 +210,7 @@ class AdminController < ApplicationController
         break unless offset < tracks_body['total'].to_i
       else
         tracks_body = JSON.parse(tracks_res.body)
-        flash[:error] = "Error when getting tracks: #{tracks_body['error']['message']} (#{tracks_body['error']['status']})"
+        flash[:danger] = "Error when getting tracks: #{tracks_body['error']['message']} (#{tracks_body['error']['status']})"
         redirect_to admin_path
         return
       end
@@ -232,7 +238,7 @@ class AdminController < ApplicationController
         end
       else
         album_res = JSON.parse(album_res.body)
-        flash[:error] = "Error when getting albums: #{album_res['error']['message']} (#{album_res['error']['status']})"
+        flash[:danger] = "Error when getting albums: #{album_res['error']['message']} (#{album_res['error']['status']})"
         redirect_to admin_path
         return
       end
@@ -254,7 +260,7 @@ class AdminController < ApplicationController
         end
       else
         artist_res = JSON.parse(artist_res.body)
-        flash[:error] = "Error when getting artists: #{artist_res['error']['message']} (#{artist_res['error']['status']})"
+        flash[:danger] = "Error when getting artists: #{artist_res['error']['message']} (#{artist_res['error']['status']})"
         redirect_to admin_path
         return
       end
@@ -280,7 +286,7 @@ class AdminController < ApplicationController
       Artist.find_by(artist_id: aa[:artist_id]).albums << Album.find_by(album_id: aa[:album_id])
     end
 
-    flash[:info] = "Successfully fetched the tracks."
+    flash[:info] = "Successfully populated the tracks."
     redirect_to admin_path
   end
 
