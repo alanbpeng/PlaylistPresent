@@ -9,25 +9,11 @@
 </head>
 <body>
 
-<% flash.each do |name, msg| %>
-  <div class="alert alert-<%= name %>"><span class="glyphicon glyphicon-<%= (name=="danger" ? "exclamation" : "info") %>-sign" aria-hidden="true"></span> <%= msg %></div>
-<% end %>
+<%= render 'layouts/alerts' %>
 
 <%= yield %>
 
-<footer class="footer">
-  <div class="container">
-    <% if params[:controller]!="admin" %>
-      <%= link_to "Admin", admin_path, class: "text-muted" %>
-      <div class="text-muted">&#8226;</div>
-    <% elsif User.count!=0 %>
-      <%= link_to "Home", root_path, class: "text-muted" %>
-      <div class="text-muted">&#8226;</div>
-    <% end %>
-    <a href="<%= ENV['source_url'] %>" target="_blank">Source 
-      <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
-    </a>
-  </div>
-</footer>
+<%= render 'layouts/footer' %>
+
 </body>
 </html>

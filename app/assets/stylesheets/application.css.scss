@@ -39,24 +39,31 @@
 	margin-top: 15px;
 	margin-bottom: 10px;
 	padding-left: 0px !important;
-	padding-right: 0px !important;
+	padding-right: 10px !important;
 }
 .album-artists {
 	color: $headings-small-color
 }
-@media only screen and (min-width: $screen-sm) {
-	.tracklist {
+
+.disc-tracklist {
+	padding-bottom: 10px
+}
+@media only screen and (min-width: $screen-md) {
+	.disc-tracklist {
 		-webkit-column-count: 2;
 		-moz-column-count: 2;
 		column-count: 2;
 	}
 }
+.tracks {
+	padding-left: 10px;
+	padding-right: 10px;
+}
 .track * {
 	display: inline;
 }
 .disc-number {
-	margin-top: 5px;
-	margin-bottom: 5px;
+	margin: 5px;
 }
 .track-name {
 	margin-left: 2px;
@@ -66,12 +73,17 @@
 }
 
 .footer {
+	padding-top: 10px;
 	padding-bottom: 10px;
 	position: fixed;
 	bottom: 0px;
 	width: 100%;
 	.container {
 		text-align: right;
+		.footer-items {
+			background-color: rgba(255, 255, 255, 0.8);
+			padding: 5px;
+		};
 		* {
 			display: inline;
 			color: unset;

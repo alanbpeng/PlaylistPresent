@@ -1,0 +1,20 @@
+<footer class="footer">
+  <div class="container">
+    <div class="footer-items">
+    <% if params[:controller]!="admin" %>
+      <%= link_to "Admin", admin_path, class: "text-muted" %>
+    <% elsif User.count!=0 %>
+      <%= link_to "Home", root_path, class: "text-muted" %>
+    <% end %>
+
+    <% unless ENV['source_url'] == nil or ENV['source_url'] == "" %>
+      <% if User.count!=0 %>
+        <div class="text-muted">&#8226;</div>
+      <% end %>
+      <a href="<%= ENV['source_url'] %>" target="_blank">Source 
+        <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+      </a>
+    <% end %>
+    </div>
+  </div>
+</footer>

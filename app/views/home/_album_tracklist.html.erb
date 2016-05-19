@@ -21,10 +21,10 @@
         <% unless album_discs.count==1 && disc==1 %>
           <h4 class="disc-number"><%= "Disc #{disc}" %></h4>
         <% end %>
-        <div class="col-xs-12 col-lg-10 tracklist">
+        <div class="col-xs-12 col-lg-10 disc-tracklist">
           <% album.tracks.where(disc_number: disc).order(:track_number).each do |track| %>
-            <div class="track" id="<%= track.track_id %>">
-              <button type="button" class="preview-btn btn btn-xs btn-default" title="Preview" aria-label="Preview" <%= raw (track.preview_url==nil ? "disabled=\"disabled\"" : "data-preview-url=\"#{track.preview_url}\"") %> >
+            <div class="track">
+              <button type="button" id="<%= track.track_id %>" class="preview-btn btn btn-xs btn-default" title="Preview" aria-label="Preview" <%= raw (track.preview_url==nil ? "disabled=\"disabled\"" : "data-preview-url=\"#{track.preview_url}\"") %> >
                   <span class="preview-icon glyphicon glyphicon-play" aria-hidden="true"></span>
                 <%= track[:track_number].to_s %>
               </button>
