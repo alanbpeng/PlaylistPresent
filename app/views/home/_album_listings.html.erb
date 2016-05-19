@@ -1,11 +1,16 @@
 <div class="container album-listing">
   <% if @albums.count!=0 %>
+    <% if @playlist_current == nil %>
+      <h3 class="current-playlist text-muted"><%= content_tag :a, @user.user_id, href: @user.url, class: "text-muted-override" %>'s library:</h3>
+    <% else %>
+      <h3 class="current-playlist text-muted"><%= content_tag :a, @playlist_current.owner, href: @playlist_current.owner_url, class: "text-muted-override" %>'s playlist "<%= content_tag :a, @playlist_current.name, href: @playlist_current.url, class: "text-muted-override" %>":</h3>
+    <% end %>
     <% @albums.each do |a| %>
       <%= render partial: 'home/album_tracklist', locals: {album: a} %>
     <% end %>
   <% elsif User.count!=0 %>
 
-    <div>Your library/selected playlist does not contain any tracks.</div>
+    <div>Your <%= (@playlist_current==nil ? "library" : "selected playlist") %> does not contain any tracks.</div>
     <div>(Or you haven't populated the tracks yet.)</div>
   
   <% end %>

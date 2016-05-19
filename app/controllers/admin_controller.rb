@@ -3,6 +3,9 @@ class AdminController < ApplicationController
 
   def index
     @user = User.first
+    unless @user == nil
+      @playlist_current = Playlist.find_by(playlist_id: @user.selected_playlist_id)
+    end
     @playlists = Playlist.all
     @albums = Album.all.order(:name)
   end
@@ -120,6 +123,7 @@ class AdminController < ApplicationController
           playlists.push(Playlist.new({playlist_id: pl['id'],
                                        name: pl['name'],
                                        owner: pl['owner']['id'],
+                                       owner_url: pl['owner']['external_urls']['spotify'],
                                        url: pl['external_urls']['spotify'],
                                        public: pl['public']=="true",
                                        collaborative: pl['collaborative']=="true"}))
@@ -288,7 +292,11 @@ class AdminController < ApplicationController
     end
 
     flash[:info] = "Successfully populated the tracks."
-    redirect_to admin_path
+    if params[:quick]
+      redirect_to root_path
+    else
+      redirect_to admin_path
+    end
   end
 
   private

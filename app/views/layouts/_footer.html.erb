@@ -2,18 +2,23 @@
   <div class="container">
     <div class="footer-items">
     <% if params[:controller]!="admin" %>
-      <%= link_to "Admin", admin_path, class: "text-muted" %>
+      <%= link_to "Admin", admin_path, class: "text-muted", title: "Admin panel (requires admin)" %>
+      <span class="text-muted">:</span>
+      <%= link_to admin_get_tracks_path(quick: true), class: "text-muted", title: "Refresh tracks (requires admin)" do %>
+        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+      <% end %>
     <% elsif User.count!=0 %>
-      <%= link_to "Home", root_path, class: "text-muted" %>
+      <%= link_to "Home", root_path, class: "text-muted", title: "Return to home" %>
     <% end %>
 
     <% unless ENV['source_url'] == nil or ENV['source_url'] == "" %>
       <% if User.count!=0 %>
         <div class="text-muted">&#8226;</div>
       <% end %>
-      <a href="<%= ENV['source_url'] %>" target="_blank">Source 
+      <%= content_tag :a, class: "text-muted", href: ENV['source_url'], target: "_blank", title: "View the source code" do %>
+        Source 
         <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
-      </a>
+      <% end %>
     <% end %>
     </div>
   </div>

@@ -4,6 +4,7 @@
       <label>
         <%= f.radio_button(:selected_playlist_id, "", class: "radio") %>
         Use your "My Music" library
+        <%= content_tag :small, "[private]", class: "text-muted" %>
       </label>
     </div>
     <% unless @playlists.count==0 %>
@@ -11,8 +12,10 @@
       <% @playlists.each do |pl| %>
         <div class="radio">
           <label>
-            <%= f.radio_button(:selected_playlist_id, pl[:playlist_id], class: "radio") %>
+            <%= f.radio_button(:selected_playlist_id, pl[:playlist_id], class: "radio", disabled: (pl.owner!=@user.user_id && !pl.public)) %>
             <%= pl[:name] %>
+            <%= "(by #{pl.owner})" unless pl.owner==@user.user_id %>
+            <%= content_tag :small, "[private]", class: "text-muted" unless pl.public %>
           </label>
         </div>
       <% end %>
@@ -20,8 +23,8 @@
       <div>You have no playlists.</div>
     <% end %>
 
-    <%= f.submit "Populate tracks", class: "btn btn-primary" %>
-    <%= link_to 'Refresh playlists', admin_refresh_playlists_path, {class: "btn btn-default", role: "button"} %>
+    <%= f.submit "Populate tracks", class: "btn btn-primary", data: {disable_with: "Populating..."} %>
+    <%= link_to 'Refresh playlists', admin_refresh_playlists_path, {class: "btn btn-default", role: "button", data: {disable_with: "Refreshing..."}} %>
     <%= link_to 'Close', root_path %>
   <% end %>
 </div>

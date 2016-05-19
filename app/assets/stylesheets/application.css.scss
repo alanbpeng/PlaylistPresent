@@ -17,8 +17,21 @@
 @import "bootstrap-sprockets";
 @import "bootstrap";
 
+.text-muted {
+	color: gray !important;
+}
+.text-muted-override {
+	color: initial !important;
+}
+
 .alert {
 	margin-bottom: 0px;
+}
+.current-playlist {
+	margin-top: 10px;
+	/*margin-bottom: 10px;*/
+	/*padding-left: 0px !important;*/
+	/*padding-right: 10px !important;*/
 }
 .album-listing {
 	padding-top: 15px;
