@@ -10,7 +10,7 @@
 <body>
 
 <% flash.each do |name, msg| %>
-  <%= content_tag :div, msg, class: "alert alert-#{name}" %>
+  <div class="alert alert-<%= name %>"><span class="glyphicon glyphicon-<%= (name=="danger" ? "exclamation" : "info") %>-sign" aria-hidden="true"></span> <%= msg %></div>
 <% end %>
 
 <%= yield %>
@@ -24,9 +24,10 @@
       <%= link_to "Home", root_path, class: "text-muted" %>
       <div class="text-muted">&#8226;</div>
     <% end %>
-    <%= link_to "Source", ENV['source_url'], class: "text-muted" %></div>
+    <a href="<%= ENV['source_url'] %>" target="_blank">Source 
+      <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+    </a>
   </div>
 </footer>
-
 </body>
 </html>

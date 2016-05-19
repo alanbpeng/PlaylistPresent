@@ -1,4 +1,4 @@
-<div class="container album_listing">
+<div class="container album-listing">
   <% if @albums.count!=0 %>
     <% @albums.each do |a| %>
       <%= render partial: 'home/album_tracklist', locals: {album: a} %>
