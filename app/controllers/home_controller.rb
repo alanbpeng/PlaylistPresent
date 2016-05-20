@@ -6,5 +6,6 @@ class HomeController < ApplicationController
     @user = User.first
     @playlist_current = Playlist.find_by(playlist_id: @user.selected_playlist_id)
     @albums = Album.all.order(:name)
+    @cc = ENV['cc_localhost_override'] || request.location.country_code
   end
 end

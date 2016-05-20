@@ -8,5 +8,6 @@ class CreateArtists < ActiveRecord::Migration
 
       t.timestamps null: false
     end
+    add_index :artists, :artist_id, unique: true
   end
 end

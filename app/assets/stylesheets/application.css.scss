@@ -42,9 +42,12 @@
 .album-tracklist {
 	margin-bottom: 10px;
 }
+.cover-art {
+	padding: 15px;
+}
 .cover-art-img {
-	padding-top: 15px;
-	padding-bottom: 15px;
+	/*padding-top: 15px;*/
+	/*padding-bottom: 15px;*/
 	max-width: 100%;
 	height: auto;
 }
@@ -76,7 +79,7 @@
 	display: inline;
 }
 .disc-number {
-	margin: 5px;
+	margin: 0px 5px 5px 5px;
 }
 .track-name {
 	margin-left: 2px;

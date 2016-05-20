@@ -1,5 +1,5 @@
 class AdminController < ApplicationController
-  http_basic_authenticate_with name: ENV['admin_username'], password: ENV['admin_password']
+  http_basic_authenticate_with name: ENV['admin_username'], password: ENV['admin_password'], except: [:index]
 
   def index
     @user = User.first
@@ -8,6 +8,7 @@ class AdminController < ApplicationController
     end
     @playlists = Playlist.all
     @albums = Album.all.order(:name)
+    @cc = ENV['localhost_override'] || request.location.country_code
   end
 
   def auth
@@ -203,6 +204,7 @@ class AdminController < ApplicationController
                                  track_number: t['track_number'].to_i,
                                  explicit: t['explicit']==true,
                                  duration_ms: t['duration_ms'].to_i,
+                                 available_markets: t['available_markets'],
                                  url: t['external_urls']['spotify'],
                                  preview_url: t['preview_url']}))
           t['artists'].each do |a|

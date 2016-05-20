@@ -1,17 +1,17 @@
 <div class="row album-tracklist" id="<%= album.album_id %>">
   <div class="hidden-xs col-sm-4 col-md-3 cover-art">
-    <%= link_to content_tag(:img, nil, src: album[:image_url], class: "cover-art-img"), album[:url] %>
+    <%= link_to content_tag(:img, nil, src: album[:image_url], class: "cover-art-img"), album[:url], target: "_blank" %>
   </div>
 
   <div class="col-xs-12 col-sm-8 col-md-9 album">
     <div class="row">
       <div class="visible-xs-block col-xs-3 cover-art">
-        <%= link_to content_tag(:img, nil, src: album[:image_url], class: "cover-art-img"), album[:url] %>
+        <%= link_to content_tag(:img, nil, src: album[:image_url], class: "cover-art-img"), album[:url], target: "_blank" %>
       </div>
       <% album_disp = album.artists.pluck(:name, :url) %>
       <h3 class="col-xs-9 col-sm-12 album-title">
-        <%= link_to album[:name], album[:url] %>
-        <small class="album-artists"><%= raw album_disp.map{|aa| link_to aa[0], aa[1]}.join(", ") %></small>
+        <%= link_to album[:name], album[:url], target: "_blank" %>
+        <small class="album-artists"><%= raw album_disp.map{|aa| link_to aa[0], aa[1], target: "_blank"}.join(", ") %></small>
       </h3>
     </div>
 
@@ -24,13 +24,13 @@
         <div class="col-xs-12 col-lg-10 disc-tracklist">
           <% album.tracks.where(disc_number: disc).order(:track_number).each do |track| %>
             <div class="track">
-              <button type="button" id="<%= track.track_id %>" class="preview-btn btn btn-xs btn-default" title="Preview" aria-label="Preview" <%= raw (track.preview_url==nil ? "disabled=\"disabled\"" : "data-preview-url=\"#{track.preview_url}\"") %> >
+              <button type="button" id="<%= track.track_id %>" class="preview-btn btn btn-xs btn-default" title="Preview" aria-label="Preview" <%= raw ((track.preview_url==nil || !JSON.parse(track.available_markets).include?(@cc)) ? "disabled=\"disabled\"" : "data-preview-url=\"#{track.preview_url}\"") %> >
                   <span class="preview-icon glyphicon glyphicon-play" aria-hidden="true"></span>
                 <%= track[:track_number].to_s %>
               </button>
-              <%= link_to track[:name], track[:url], class: "track-name" %>
+              <%= link_to track[:name], track[:url], class: "track-name", target: "_blank" %>
               <% track_disp = track.artists.pluck(:name, :url).delete_if { |track| album_disp.include?(track) } %>
-              <small class="track-artists"><%= raw (track_disp.empty? ? "" : " \u2022 " + track_disp.map{|ta| link_to ta[0], ta[1]}.join(", ")) %></small>
+              <small class="track-artists"><%= raw (track_disp.empty? ? "" : " \u2022 " + track_disp.map{|ta| link_to ta[0], ta[1], target: "_blank"}.join(", ")) %></small>
             </div>
           <% end %>
         </div>
