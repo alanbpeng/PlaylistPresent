@@ -12,7 +12,7 @@
       <% @playlists.each do |pl| %>
         <div class="radio">
           <label>
-            <%= f.radio_button(:selected_playlist_id, pl[:playlist_id], class: "radio", disabled: (pl.owner!=@user.user_id && !pl.public)) %>
+            <%= f.radio_button(:selected_playlist_id, pl[:playlist_id], class: "radio", disabled: (pl.owner!=@user.user_id)) %>
             <%= pl[:name] %>
             <%= "(by #{pl.owner})" unless pl.owner==@user.user_id %>
             <%= content_tag :small, "[private]", class: "text-muted" unless pl.public %>
