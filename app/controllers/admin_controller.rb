@@ -17,11 +17,10 @@ class AdminController < ApplicationController
     # Determines whether to display the authorization dialogue box
     # even when previously authorized
     show_dialog = false
-
     # Setup the state and redirect_uri parameters
     session[:redirect_uri] = "#{request.original_url}/callback"
     session[:state] = Random::DEFAULT.rand(10000000...100000000).to_s
-
+    
     # redirect to Spotify page for authorization
     redirect_to "https://accounts.spotify.com/authorize/?client_id=#{ENV['spotify_client_id']}&response_type=code&redirect_uri=#{session[:redirect_uri]}&scope=playlist-read-private%20playlist-read-collaborative%20user-library-read&state=#{session[:state]}&show_dialog=#{show_dialog.to_s}"
   end
@@ -47,7 +46,7 @@ class AdminController < ApplicationController
       redirect_to admin_path
       return
     end
-
+    
     # Proceed to next step when done
     redirect_to admin_refresh_playlists_path
     return
@@ -222,11 +221,11 @@ class AdminController < ApplicationController
   # Makes a GET request for the tracks in the selected playlist
   def call_get_playlist_tracks(user, offset=0, limit=100)
     owner = Playlist.find_by(playlist_id: user.selected_playlist_id).owner
-    fields = "items(track(album(external_urls(spotify),id,images,name),artists(external_urls(spotify),id,name),disc_number,duration_ms,explicit,external_urls(spotify),id,name,preview_url,track_number)),limit,offset,total"
+    # fields = "items(track(album(external_urls(spotify),id,images,name),artists(external_urls(spotify),id,name),disc_number,duration_ms,explicit,external_urls(spotify),id,name,preview_url,track_number)),limit,offset,total"
 
     # Set up the request
     spotify_uri = URI("https://api.spotify.com/v1/users/#{owner}/playlists/#{user.selected_playlist_id}/tracks")
-    spotify_uri.query = URI.encode_www_form({fields: fields, limit: limit, offset: offset})
+    spotify_uri.query = URI.encode_www_form({limit: limit, offset: offset})
     spotify_req = Net::HTTP::Get.new(spotify_uri)
     spotify_req['Authorization'] = "Bearer #{user.get_access_token}"
 
