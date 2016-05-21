@@ -62,43 +62,13 @@ class AdminController < ApplicationController
   end
 
   def refresh_playlists
-    user = User.first
-
-    # Populate the available playlists
-    playlists = []
-    offset = 0
-    while true do
-      begin
-        playlists_res = call_get_playlists(user, offset)
-      rescue RuntimeError => err
-        flash[:danger] = err
-        redirect_to admin_path
-        return
-      end
-      if playlists_res.is_a?(Net::HTTPSuccess)
-        playlists_body = JSON.parse(playlists_res.body)
-        playlists_body['items'].each do |pl|
-          playlists.push(Playlist.new({playlist_id: pl['id'],
-                                       name: pl['name'],
-                                       owner: pl['owner']['id'],
-                                       owner_url: pl['owner']['external_urls']['spotify'],
-                                       url: pl['external_urls']['spotify'],
-                                       public: pl['public']=="true",
-                                       collaborative: pl['collaborative']=="true"}))
-        end
-        offset = playlists_body['limit'].to_i + playlists_body['offset']
-        break unless offset < playlists_body['total'].to_i
-      else
-        playlists_body = JSON.parse(playlists_res.body)
-        flash[:danger] = "Error when getting playlists: #{playlists_body['error']['message']} (#{playlists_body['error']['status']})"
-        redirect_to admin_path
-        return
-      end
-    end
-
-    Playlist.destroy_all
-    playlists.each do |pl|
-      pl.save
+    begin
+      # Populate the available playlists
+      Playlist.populate_playlists
+    rescue RuntimeError => err
+      flash[:danger] = err
+      redirect_to admin_path
+      return
     end
 
     if flash[:info]
@@ -248,17 +218,6 @@ class AdminController < ApplicationController
   end
 
   private
-
-  # Makes a GET request for the user's playlists
-  def call_get_playlists(user, offset=0, limit=50)
-    # Set up the request
-    spotify_uri = URI("https://api.spotify.com/v1/me/playlists")
-    spotify_uri.query = URI.encode_www_form({limit: limit, offset: offset})
-    spotify_req = Net::HTTP::Get.new(spotify_uri)
-    spotify_req['Authorization'] = "Bearer #{user.get_access_token}"
-
-    SendRequest.send_request(spotify_uri, spotify_req)
-  end
 
   # Makes a GET request for the tracks in the selected playlist
   def call_get_playlist_tracks(user, offset=0, limit=100)
