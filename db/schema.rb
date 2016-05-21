@@ -24,13 +24,14 @@ ActiveRecord::Schema.define(version: 20160517054013) do
   end
 
   create_table "albums", force: :cascade do |t|
-    t.string   "album_id",   null: false
+    t.string   "album_id",          null: false
     t.string   "name"
     t.string   "image_url"
     t.string   "year"
+    t.string   "available_markets"
     t.string   "url"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at",        null: false
+    t.datetime "updated_at",        null: false
   end
 
   add_index "albums", ["album_id"], name: "index_albums_on_album_id", unique: true, using: :btree

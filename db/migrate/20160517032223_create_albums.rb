@@ -6,6 +6,7 @@ class CreateAlbums < ActiveRecord::Migration
       # t.string :artist_id
       t.string :image_url
       t.string :year
+      t.string :available_markets
       t.string :url
 
       t.timestamps null: false
