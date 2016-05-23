@@ -16,13 +16,13 @@ class AdminController < ApplicationController
   def auth
     # Determines whether to display the authorization dialogue box
     # even when previously authorized
-    show_dialog = false
+    show_dialog = true
     # Setup the state and redirect_uri parameters
-    session[:redirect_uri] = "#{request.original_url}/callback"
-    session[:state] = Random::DEFAULT.rand(10000000...100000000).to_s
+    flash[:redirect_uri] = "#{request.original_url}/callback"
+    flash[:state] = SecureRandom.hex()
     
     # redirect to Spotify page for authorization
-    redirect_to "https://accounts.spotify.com/authorize/?client_id=#{ENV['spotify_client_id']}&response_type=code&redirect_uri=#{session[:redirect_uri]}&scope=playlist-read-private%20playlist-read-collaborative%20user-library-read&state=#{session[:state]}&show_dialog=#{show_dialog.to_s}"
+    redirect_to "https://accounts.spotify.com/authorize/?client_id=#{ENV['spotify_client_id']}&response_type=code&redirect_uri=#{flash[:redirect_uri]}&scope=playlist-read-private%20playlist-read-collaborative%20user-library-read&state=#{flash[:state]}&show_dialog=#{show_dialog.to_s}"
   end
 
   def callback
@@ -30,10 +30,10 @@ class AdminController < ApplicationController
       # Parse the returned parameters
       auth_res_params = CGI.parse(request.query_string)
       # Checks if the state parameter is consistent
-      if auth_res_params.has_key?("state") && auth_res_params["state"][0] == session[:state]
+      if auth_res_params.has_key?("state") && auth_res_params["state"][0] == flash[:state]
         # Check for either code or error parameter
         if auth_res_params.has_key?("code")
-          User.create_user(auth_res_params["code"][0], session[:redirect_uri])
+          User.create_user(auth_res_params["code"][0], flash[:redirect_uri])
         elsif auth_res_params.has_key?("error")
           raise "Error when authenticating: returned \"#{auth_res_params["error"][0]}\""
         end
@@ -48,6 +48,8 @@ class AdminController < ApplicationController
     end
     
     # Proceed to next step when done
+    destroy_data
+    flash[:info] = "You have been signed in."
     redirect_to admin_refresh_playlists_path
     return
   end
@@ -117,7 +119,7 @@ class AdminController < ApplicationController
                                    preview_url: t['preview_url']}))
             t['artists'].each do |a|
               track_artists.push({track_id: t['id'], artist_id: a['id']})
-              artist_ids.push(a['id'])
+              artist_ids.push({artist_id: a['id'], name: a['name'], url: a['external_urls']['spotify']})
             end
             album_ids.push(t['album']['id'])
           end
@@ -149,7 +151,7 @@ class AdminController < ApplicationController
                                    available_markets: a['available_markets']}))
             a['artists'].each do |ar|
               album_artists.push({album_id: a['id'], artist_id: ar['id']})
-              artist_ids.push(ar['id'])
+              artist_ids.push({artist_id: ar['id'], name: ar['name'], url: ar['external_urls']['spotify']})
             end
           end
         else
@@ -163,24 +165,31 @@ class AdminController < ApplicationController
       # Get artist information 50 at a time
       artists = []
       artist_ids = artist_ids.uniq
-      while artist_ids.count>0 do
-        artist_queries = artist_ids.shift(50).join(',')
-        artist_res = call_get_artists(user, artist_queries)
-        if artist_res.is_a?(Net::HTTPSuccess)
-          artist_body = JSON.parse(artist_res.body)
-          artist_body['artists'].each do |a|
-            artists.push(Artist.new({artist_id: a['id'],
-                                     name: a['name'],
-                                     image_url: a['images'][0],
-                                     url: a['external_urls']['spotify']}))
-          end
-        else
-          artist_res = JSON.parse(artist_res.body)
-          flash[:danger] = "Error when getting artists: #{artist_res['error']['message']} (#{artist_res['error']['status']})"
-          redirect_to admin_path
-          return
-        end
+      # while artist_ids.count>0 do
+      #   artist_queries = artist_ids.shift(50).join(',')
+      #   artist_res = call_get_artists(user, artist_queries)
+      #   if artist_res.is_a?(Net::HTTPSuccess)
+      #     artist_body = JSON.parse(artist_res.body)
+      #     artist_body['artists'].each do |a|
+      #       artists.push(Artist.new({artist_id: a['id'],
+      #                                name: a['name'],
+      #                                image_url: a['images'][0],
+      #                                url: a['external_urls']['spotify']}))
+      #     end
+      #   else
+      #     artist_res = JSON.parse(artist_res.body)
+      #     flash[:danger] = "Error when getting artists: #{artist_res['error']['message']} (#{artist_res['error']['status']})"
+      #     redirect_to admin_path
+      #     return
+      #   end
+      # end
+      artist_ids.each do |a|
+        artists.push(Artist.new({artist_id: a[:artist_id],
+                                 name: a[:name],
+                                 # image_url: nil,
+                                 url: a[:url]}))
       end
+
 
       # Reset and save all data, as well as the associations
       destroy_data
