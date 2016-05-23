@@ -1,25 +1,25 @@
 class Playlist < ActiveRecord::Base
-  require "send_request"
+  require "get_helpers"
 
   validates :playlist_id, uniqueness: true
   # self.primary_key = :playlist_id
 
   # Populate the available playlists
-  def self.populate_playlists
+  def self.get_playlists(user)
     playlists = []
     offset = 0
     while true do
-      playlists_res = self.call_get_playlists(User.first, offset)
+      playlists_res = self.call_get_playlists(user, offset)
       playlists_body = JSON.parse(playlists_res.body)
       if playlists_res.is_a?(Net::HTTPSuccess)
         playlists_body['items'].each do |pl|
           playlists.push(self.new({playlist_id: pl['id'],
-                                       name: pl['name'],
-                                       owner: pl['owner']['id'],
-                                       owner_url: pl['owner']['external_urls']['spotify'],
-                                       url: pl['external_urls']['spotify'],
-                                       public: pl['public']=="true",
-                                       collaborative: pl['collaborative']=="true"}))
+                                   name: pl['name'],
+                                   owner: pl['owner']['id'],
+                                   owner_url: pl['owner']['external_urls']['spotify'],
+                                   url: pl['external_urls']['spotify'],
+                                   public: pl['public']=="true",
+                                   collaborative: pl['collaborative']=="true"}))
         end
         offset = playlists_body['limit'].to_i + playlists_body['offset']
         break unless offset < playlists_body['total'].to_i
@@ -29,7 +29,7 @@ class Playlist < ActiveRecord::Base
     end
     self.destroy_all
     playlists.each do |pl|
-      pl.save
+      pl.save if pl.owner==user.user_id
     end
   end
 
@@ -43,7 +43,7 @@ class Playlist < ActiveRecord::Base
     spotify_req = Net::HTTP::Get.new(spotify_uri)
     spotify_req['Authorization'] = "Bearer #{user.get_access_token}"
 
-    SendRequest.send_request(spotify_uri, spotify_req)
+    GetHelpers.send_request(spotify_uri, spotify_req)
   end
 
 end
