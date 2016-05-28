@@ -24,7 +24,6 @@ ActiveRecord::Schema.define(version: 20160517054013) do
   end
 
   add_index "album_artists", ["album_id"], name: "index_album_artists_on_album_id", using: :btree
-  add_index "album_artists", ["artist_id"], name: "index_album_artists_on_artist_id", using: :btree
 
   create_table "albums", force: :cascade do |t|
     t.string   "album_id",          null: false
@@ -70,7 +69,6 @@ ActiveRecord::Schema.define(version: 20160517054013) do
     t.datetime "updated_at", null: false
   end
 
-  add_index "track_artists", ["artist_id"], name: "index_track_artists_on_artist_id", using: :btree
   add_index "track_artists", ["track_id"], name: "index_track_artists_on_track_id", using: :btree
 
   create_table "tracks", force: :cascade do |t|
