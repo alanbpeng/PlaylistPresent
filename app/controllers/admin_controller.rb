@@ -1,7 +1,7 @@
 class AdminController < ApplicationController
   require 'get_helpers'
 
-  http_basic_authenticate_with name: ENV['admin_username'], password: ENV['admin_password'], except: [:index]
+  http_basic_authenticate_with name: ENV['admin_username'], password: ENV['admin_password']
 
   def index
     @user = User.first
